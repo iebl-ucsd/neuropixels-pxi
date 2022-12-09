@@ -11,9 +11,10 @@ public:
 	{
         file.create();
 
-        if (settings.probeType == ProbeType::NP1 || 
+        if (settings.probeType == ProbeType::NP1 ||
+            settings.probeType == ProbeType::UG3 ||
             settings.probeType == ProbeType::NHP10 ||
-            settings.probeType == ProbeType::NHP25 || 
+            settings.probeType == ProbeType::NHP25 ||
             settings.probeType == ProbeType::NHP45 ||
             settings.probeType == ProbeType::UHD1)
         {
@@ -142,7 +143,7 @@ public:
 
     static void parseValues(Array<int> values, ProbeType probeType, ProbeSettings& settings)
     {
-        if (probeType == ProbeType::NP1 || probeType == ProbeType::NHP10)
+        if (probeType == ProbeType::NP1 || probeType == ProbeType::NHP10 || probeType == ProbeType::UG3)
         {
             // 0 = 1.0 probe
            // channel ID

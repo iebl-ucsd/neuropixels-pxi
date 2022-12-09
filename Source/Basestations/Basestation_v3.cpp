@@ -148,9 +148,11 @@ bool Basestation_v3::open()
 						headstage = nullptr;
 					}
 				}
-				else if (hsPartNumber == "NPNH_HS_30") // 128-ch analog headstage
+				else if (hsPartNumber == "NPNH_HS_30") // 128-ch analog headstage OR 384-ch analog UG3 headstage
 				{
-					LOGC("      Found 128-ch analog headstage on port: ", port);
+                    // NOTE: we dynamically determine if this is a UG3 probe or a "normal" NHP passive probe based on
+                    // a whitelist of hard-coded serial numbers. See details in the implementation below.
+					LOGC("      Found 128-ch or 384-ch analog headstage on port: ", port);
 					headstage = new Headstage_Analog128(this, port);
 				}
 				else if (hsPartNumber == "NPM_HS_30" || hsPartNumber == "NPM_HS_01") // 2.0 headstage, 2 docks

@@ -29,6 +29,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../NeuropixComponents.h"
 
 
+/**
+ * NOTE: this is EITHER a standard passive 128-ch headstage used for NHP passive probes, OR a 384-ch passive headstage
+ * used for the UG3 project.
+ */
 class Headstage_Analog128 : public Headstage
 {
 public:
