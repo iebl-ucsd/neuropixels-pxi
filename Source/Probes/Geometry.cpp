@@ -40,7 +40,10 @@ bool Geometry::forPartNumber(String PN,
 		NHP2(45, em, pm);
 
 	else if (PN.equalsIgnoreCase("NP1200") || PN.equalsIgnoreCase("NP1210"))
-		NHP1(em, pm);
+        NHP1(em, pm);
+
+    else if (PN.equalsIgnoreCase("UG3100"))
+        UG3(em, pm);
 
 	else if (PN.equalsIgnoreCase("PRB2_1_2_0640_0") || PN.equalsIgnoreCase("PRB2_1_4_0480_1") || PN.equalsIgnoreCase("NP2000"))
 		NP2(1, em, pm);
@@ -526,6 +529,66 @@ void Geometry::NHP1(Array<ElectrodeMetadata>& electrodeMetadata,
 	}
 }
 
+
+void Geometry::UG3(Array<ElectrodeMetadata>& electrodeMetadata,
+                    ProbeMetadata& probeMetadata)
+{
+
+    probeMetadata.type = ProbeType::UG3;
+    probeMetadata.name = "Neuropixels UG3";
+
+    Path path;
+    path.startNewSubPath(27, 31);
+    path.lineTo(27, 514);
+    path.lineTo(27 + 10, 514);
+    path.lineTo(27 + 10, 31);
+    path.closeSubPath();
+
+    probeMetadata.shank_count = 1;
+    probeMetadata.electrodes_per_shank = 384;
+    probeMetadata.rows_per_shank = 384;
+    probeMetadata.columns_per_shank = 1;
+    probeMetadata.shankOutline = path;
+    probeMetadata.num_adcs = 32;
+
+    probeMetadata.availableBanks =
+            { Bank::A
+            };
+
+    Array<int> channel_map;
+    for (int i = 0; i < 384; i++) {
+        // NB: seems to be 1-indexed in others
+        channel_map.add(i + 1);
+    }
+
+    Array<float> xpositions = { 27.0f, 59.0f, 11.0f, 43.0f };
+
+    for (int i = 0; i < 384; i++)
+    {
+        ElectrodeMetadata metadata;
+
+        metadata.global_index = i;
+
+        metadata.shank = 0;
+        metadata.shank_local_index = i;
+
+        // Arbitrary, set to "NP-like" dimensions
+        metadata.xpos = 35;
+        metadata.ypos = i * 10.0f;
+        metadata.site_width = 12;
+
+        metadata.column_index = 0;
+        metadata.row_index = metadata.shank_local_index;
+
+        metadata.bank = Bank::A;
+        metadata.channel = channel_map[i];
+        metadata.status = ElectrodeStatus::CONNECTED;
+
+        metadata.isSelected = false;
+
+        electrodeMetadata.add(metadata);
+    }
+}
 
 
 void Geometry::NHP2(int length, 

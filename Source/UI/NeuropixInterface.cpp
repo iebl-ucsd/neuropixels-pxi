@@ -1612,6 +1612,9 @@ void NeuropixInterface::loadParameters(XmlElement* xml)
                     else if (PN.equalsIgnoreCase("NP1200") || PN.equalsIgnoreCase("NP1210"))
                         type = ProbeType::NHP1;
 
+                    else if (PN.equalsIgnoreCase("UG3100"))
+                        type = ProbeType::UG3;
+
                     else if (PN.equalsIgnoreCase("PRB2_1_2_0640_0") || PN.equalsIgnoreCase("NP2000"))
                         type = ProbeType::NP2_1;
 

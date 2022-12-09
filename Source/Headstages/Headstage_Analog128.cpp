@@ -23,6 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "Headstage_Analog128.h"
 #include "../Probes/Neuropixels_NHP_Passive.h"
+#include "../Probes/Neuropixels_UG3_Passive.h"
 
 #define MAXLEN 50
 
@@ -78,7 +79,24 @@ Headstage_Analog128::Headstage_Analog128(Basestation* bs_, int port) : Headstage
 
 	flexCables.add(new Flex1_NHP(this));
 
-	probes.add(new Neuropixels_NHP_Passive(basestation, this, flexCables[0]));
+    const std::vector<uint64_t> UG3_HEADSTAGE_SERIAL_NUMBERS = {
+            // TODO: fill these in
+            0,
+    };
+
+    bool isUG3 = false;
+    for (uint64_t snUG3 : UG3_HEADSTAGE_SERIAL_NUMBERS) {
+        if (info.serial_number == snUG3) {
+            isUG3 = true;
+            break;
+        }
+    }
+
+    if (isUG3) {
+        probes.add(new Neuropixels_UG3_Passive(basestation, this, flexCables[0], info.serial_number));
+    } else {
+        probes.add(new Neuropixels_NHP_Passive(basestation, this, flexCables[0]));
+    }
 	probes[0]->setStatus(SourceStatus::CONNECTING);
 }
 

@@ -75,6 +75,7 @@ enum class BasestationType {
 enum class ProbeType {
 	NONE = 1,
 	NP1,
+    UG3,
 	NHP10,
 	NHP25,
 	NHP45,

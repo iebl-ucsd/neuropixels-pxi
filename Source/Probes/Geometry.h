@@ -73,6 +73,11 @@ public:
 	static void UHD(bool switchable, Array<ElectrodeMetadata>& em,
 		ProbeMetadata& pm);
 
+    /**
+     * Neuropixels UG3; see Neuropixels_UG3_Passive for details
+     */
+    static void UG3(Array<ElectrodeMetadata>& em, ProbeMetadata& pm);
+
 	/** Neuropixels Opto
 	*/
 	static void OPTO(Array<ElectrodeMetadata>& em, 
