@@ -26,6 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 #include "../API/v3/NeuropixAPI.h"
+#include "../API/v1/NeuropixAPI.h"
 #include "../NeuropixComponents.h"
 
 
@@ -49,6 +50,16 @@ class Flex1_NHP : public Flex
 public:
 	Flex1_NHP::Flex1_NHP(Headstage*);
 	void getInfo() override;
+
+	Neuropixels::NP_ErrorCode errorCode;
+};
+
+
+class Flex1_UG3 : public Flex
+{
+public:
+	Flex1_UG3::Flex1_UG3(Headstage*);
+	void getInfo() override {}
 
 	Neuropixels::NP_ErrorCode errorCode;
 };

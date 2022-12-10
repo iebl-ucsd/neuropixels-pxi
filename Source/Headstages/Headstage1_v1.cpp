@@ -23,7 +23,36 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "Headstage1_v1.h"
 #include "../Probes/Neuropixels1_v1.h"
+#include "../Probes/Neuropixels_UG3_Passive_v1.h"
 #include "../Probes/Neuropixels_UHD.h"
+
+const std::vector<uint64_t> Headstage1_v1::UG3_HEADSTAGE_SERIAL_NUMBERS = {
+        99999000,
+        99999001,
+        99999002,
+        99999003,
+        99999004,
+        99999005,
+        99999006,
+        99999007,
+        99999008,
+        99999009,
+        99999010,
+        99999011,
+        99999012,
+        99999013,
+        99999014,
+        99999015,
+        99999016,
+        99999017,
+        99999018,
+        99999019,
+        99999020,
+        99999021,
+        99999022,
+        99999023,
+};
+
 
 #define MAXLEN 50
 
@@ -85,17 +114,31 @@ Headstage1_v1::Headstage1_v1(Basestation* bs_, int port) : Headstage(bs_, port)
 	else
 	{
 		testModule = nullptr;
-		flexCables.add(new Flex1_v1(this));
 
-		char partNumber[MAXLEN];
-		errorCode = np::readProbePN(basestation->slot, port, partNumber, MAXLEN);
-		
-		if (String(partNumber).equalsIgnoreCase("NP1110"))
-		{
-			probes.add(new Neuropixels_UHD(basestation, this, flexCables[0]));
+		bool isUG3 = false;
+		for (uint64_t snUG3 : UG3_HEADSTAGE_SERIAL_NUMBERS) {
+			if (info.serial_number == snUG3) {
+				isUG3 = true;
+				break;
+			}
 		}
-		else {
-			probes.add(new Neuropixels1_v1(basestation, this, flexCables[0]));
+
+		if (isUG3) {
+			flexCables.add(new Flex1_v1_dummy(this));
+			probes.add(new Neuropixels_UG3_Passive_v1(basestation, this, flexCables[0], info.serial_number));
+		} else {
+			flexCables.add(new Flex1_v1(this));
+
+			char partNumber[MAXLEN];
+			errorCode = np::readProbePN(basestation->slot, port, partNumber, MAXLEN);
+
+			if (String(partNumber).equalsIgnoreCase("NP1110"))
+			{
+				probes.add(new Neuropixels_UHD(basestation, this, flexCables[0]));
+			}
+			else {
+				probes.add(new Neuropixels1_v1(basestation, this, flexCables[0]));
+			}
 		}
 		
 		probes[0]->setStatus(SourceStatus::CONNECTING);
@@ -121,6 +164,15 @@ Flex1_v1::Flex1_v1(Headstage* hs_) : Flex(hs_, 1)
 	errorCode = np::SUCCESS;
 }
 
+
+Flex1_v1_dummy::Flex1_v1_dummy(Headstage* hs_) : Flex(hs_, 1)
+{
+	unsigned char version_major = 0;
+	unsigned char version_minor = 0;
+	info.version = String(version_major) + "." + String(version_minor);
+	info.part_number = String("0");
+	errorCode = np::SUCCESS;
+}
 
 /****************Headstage Test Module**************************/
 

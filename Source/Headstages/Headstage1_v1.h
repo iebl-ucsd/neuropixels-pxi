@@ -38,6 +38,8 @@ public:
 	void runTestModule() override;
 
 	np::NP_ErrorCode errorCode;
+
+    static const std::vector<uint64_t> UG3_HEADSTAGE_SERIAL_NUMBERS;
 };
 
 class Flex1_v1 : public Flex
@@ -45,6 +47,16 @@ class Flex1_v1 : public Flex
 public:
 	Flex1_v1::Flex1_v1(Headstage*);
 	void getInfo() override;
+
+	np::NP_ErrorCode errorCode;
+};
+
+/** For the V1 Flex implementation for the UG3 project. */
+class Flex1_v1_dummy : public Flex
+{
+public:
+	Flex1_v1_dummy::Flex1_v1_dummy(Headstage*);
+	void getInfo() override {}
 
 	np::NP_ErrorCode errorCode;
 };

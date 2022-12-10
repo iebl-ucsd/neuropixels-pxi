@@ -77,11 +77,9 @@ Headstage_Analog128::Headstage_Analog128(Basestation* bs_, int port) : Headstage
 {
 	getInfo();
 
-	flexCables.add(new Flex1_NHP(this));
 
     const std::vector<uint64_t> UG3_HEADSTAGE_SERIAL_NUMBERS = {
-            // TODO: fill these in
-            0,
+			99999001,
     };
 
     bool isUG3 = false;
@@ -93,8 +91,10 @@ Headstage_Analog128::Headstage_Analog128(Basestation* bs_, int port) : Headstage
     }
 
     if (isUG3) {
+		flexCables.add(new Flex1_UG3(this));
         probes.add(new Neuropixels_UG3_Passive(basestation, this, flexCables[0], info.serial_number));
     } else {
+		flexCables.add(new Flex1_NHP(this));
         probes.add(new Neuropixels_NHP_Passive(basestation, this, flexCables[0]));
     }
 	probes[0]->setStatus(SourceStatus::CONNECTING);
@@ -108,3 +108,14 @@ Flex1_NHP::Flex1_NHP(Headstage* hs_) : Flex(hs_, 0)
 	errorCode = Neuropixels::SUCCESS;
 }
 
+
+Flex1_UG3::Flex1_UG3(Headstage* hs_) : Flex(hs_, 0)
+{
+
+	int version_major = 0;
+	int version_minor = 0;
+
+	info.version = String(version_major) + "." + String(version_minor);
+	info.part_number = String("0");
+	errorCode = Neuropixels::SUCCESS;
+}
