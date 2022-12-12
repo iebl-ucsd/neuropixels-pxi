@@ -33,6 +33,9 @@ set(CMAKE_CXX_STANDARD 17)
 
 set(SOURCE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/Source)
 file(GLOB_RECURSE SRC_FILES LIST_DIRECTORIES false "${SOURCE_PATH}/*.cpp" "${SOURCE_PATH}/*.h")
+list(REMOVE_ITEM SRC_FILES "${SOURCE_PATH}/Cli.cpp")
+list(REMOVE_ITEM SRC_FILES "${SOURCE_PATH}/Cli_v1.cpp")
+
 set(GUI_COMMONLIB_DIR ${GUI_BASE_DIR}/installed_libs)
 
 set(CONFIGURATION_FOLDER $<$<CONFIG:Debug>:Debug>$<$<NOT:$<CONFIG:Debug>>:Release>)
@@ -112,3 +115,13 @@ target_link_libraries(${PLUGIN_NAME} ${NEUROPIX2_LINK_DIR})
 #
 #target_link_libraries(${PLUGIN_NAME} ${LIBNAME_LIBRARIES})
 #target_include_directories(${PLUGIN_NAME} PRIVATE ${LIBNAME_INCLUDE_DIRS})
+
+
+add_executable(npcli "${SOURCE_PATH}/Cli.cpp")
+target_link_libraries(npcli ${NEUROPIX_LINK_DIR})
+target_link_libraries(npcli ${NEUROPIX2_LINK_DIR})
+
+
+add_executable(npcliv1 "${SOURCE_PATH}/Cli_v1.cpp")
+target_link_libraries(npcliv1 ${NEUROPIX_LINK_DIR})
+target_link_libraries(npcliv1 ${NEUROPIX2_LINK_DIR})

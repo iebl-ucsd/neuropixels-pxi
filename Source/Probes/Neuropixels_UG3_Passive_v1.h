@@ -21,28 +21,28 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-#ifndef __NEUROPIXUG3_PASSIVE_H_2C4C2D67__
-#define __NEUROPIXUG3_PASSIVE_H_2C4C2D67__
+#ifndef __NEUROPIXUG3_PASSIVE_V1_H_2C4C2D67__
+#define __NEUROPIXUG3_PASSIVE_V1_H_2C4C2D67__
 
 #include "../NeuropixComponents.h"
 
-#include "../API/v3/NeuropixAPI.h"
+#include "../API/v1/NeuropixAPI.h"
 
 #define MAXPACKETS 64
 
 /**
 
 	Acquires data from a 384-channel IMEC headstage, connected to a subset of
-    UG3 grid or depth probe channels. Multiple instances of this Neuropixels_UG3_Passive probe
-    (i.e. multiple IMEC headstages) correspond to a single 1024-+ channel UG3 grid.
+	UG3 grid or depth probe channels. Multiple instances of this Neuropixels_UG3_Passive probe
+	(i.e. multiple IMEC headstages) correspond to a single 1024-+ channel UG3 grid.
 */
 
-class Neuropixels_UG3_Passive : public Probe
+class Neuropixels_UG3_Passive_v1 : public Probe
 {
 public:
 
 	/** Constructor */
-	Neuropixels_UG3_Passive(Basestation* bs, Headstage* hs, Flex* fl, uint64_t serialNumber);
+	Neuropixels_UG3_Passive_v1(Basestation* bs, Headstage* hs, Flex* fl, uint64_t serialNumber);
 
 	/** Reads probe part number and serial number */
 	void getInfo() override;
@@ -67,7 +67,7 @@ public:
 
 	/** Sets AP filter cut based on settings.apFilterState */
 	void setApFilterState() override;
-	
+
 	/** Writes latest settings to the probe (slow) */
 	void writeConfiguration() override;
 
@@ -94,10 +94,11 @@ public:
 
 private:
 
-	Neuropixels::electrodePacket packet[SAMPLECOUNT];
-	Neuropixels::NP_ErrorCode errorCode;
+	np::electrodePacket packet[SAMPLECOUNT];
+	np::NP_ErrorCode errorCode;
+    np::bistElectrodeStats stats[960];
 
-	Array<int> channel_map;
+    Array<int> channel_map;
 
 	int SKIP;
 
