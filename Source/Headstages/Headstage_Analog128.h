@@ -26,14 +26,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 #include "../API/v3/NeuropixAPI.h"
-#include "../API/v1/NeuropixAPI.h"
 #include "../NeuropixComponents.h"
 
 
-/**
- * NOTE: this is EITHER a standard passive 128-ch headstage used for NHP passive probes, OR a 384-ch passive headstage
- * used for the UG3 project.
- */
 class Headstage_Analog128 : public Headstage
 {
 public:
@@ -50,16 +45,6 @@ class Flex1_NHP : public Flex
 public:
 	Flex1_NHP::Flex1_NHP(Headstage*);
 	void getInfo() override;
-
-	Neuropixels::NP_ErrorCode errorCode;
-};
-
-
-class Flex1_UG3 : public Flex
-{
-public:
-	Flex1_UG3::Flex1_UG3(Headstage*);
-	void getInfo() override {}
 
 	Neuropixels::NP_ErrorCode errorCode;
 };
