@@ -83,6 +83,7 @@ Neuropixels_UG3_Passive_v1::Neuropixels_UG3_Passive_v1(Basestation* bs, Headstag
 	settings.availableLfpGains.add(3000.0f);
 
 	// Only external reference available
+    // TODO: allow switching between references?
 	settings.availableReferences.add("REF_ELEC");
 
 	open();
@@ -190,21 +191,7 @@ void Neuropixels_UG3_Passive_v1::calibrate()
 
 void Neuropixels_UG3_Passive_v1::selectElectrodes()
 {
-	for (int bank = 0; bank < 1; bank++) {
-		for (int ch = 0; ch < 128; ch++)
-		{
-			errorCode = np::selectElectrode(
-				basestation->slot,
-				headstage->port,
-				ch,
-				bank);
-			if (errorCode != np::NP_ErrorCode::SUCCESS) {
-				LOGD("selectElectrode failed! error code ", errorCode, " channel ", ch);
-			}
-		}
-
-	}
-
+    // Nothing to select
 }
 
 void Neuropixels_UG3_Passive_v1::setApFilterState()
