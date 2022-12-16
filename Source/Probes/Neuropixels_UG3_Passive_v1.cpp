@@ -196,11 +196,16 @@ void Neuropixels_UG3_Passive_v1::selectElectrodes()
 
 void Neuropixels_UG3_Passive_v1::setApFilterState()
 {
-	for (int channel = 0; channel < 384; channel++)
-		np::setAPCornerFrequency(basestation->slot,
+	for (int channel = 0; channel < 384; channel++) {
+		errorCode = np::setAPCornerFrequency(basestation->slot,
 			headstage->port,
 			channel,
 			!settings.apFilterState); // true if disabled
+        if (errorCode != np::SUCCESS) {
+            LOGD("Failed to set AP filter state for channel ", channel, " with status code ", errorCode);
+        }
+    }
+
 }
 
 void Neuropixels_UG3_Passive_v1::setAllGains()
@@ -208,10 +213,14 @@ void Neuropixels_UG3_Passive_v1::setAllGains()
 
 	for (int channel = 0; channel < 384; channel++)
 	{
-		np::setGain(basestation->slot, headstage->port,
+		errorCode = np::setGain(basestation->slot, headstage->port,
 			channel,
 			settings.apGainIndex,
 			settings.lfpGainIndex);
+
+        if (errorCode != np::SUCCESS) {
+            LOGD("Failed to set gain for channel ", channel, " with status code ", errorCode);
+        }
 	}
 
 }
@@ -223,9 +232,13 @@ void Neuropixels_UG3_Passive_v1::setAllReferences()
 	np::channelreference_t refId = np::EXT_REF;
 	int refElectrodeBank = 0;
 
-	for (int channel = 0; channel < 384; channel++)
-		np::setReference(basestation->slot, headstage->port, channel, refId, refElectrodeBank);
+	for (int channel = 0; channel < 384; channel++) {
+        errorCode = np::setReference(basestation->slot, headstage->port, channel, refId, refElectrodeBank);
 
+        if (errorCode != np::SUCCESS) {
+            LOGD("Failed to set reference for channel ", channel, " with status code ", errorCode);
+        }
+    }
 
 }
 
