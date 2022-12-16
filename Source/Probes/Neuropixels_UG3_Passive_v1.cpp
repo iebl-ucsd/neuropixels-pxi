@@ -94,7 +94,7 @@ bool Neuropixels_UG3_Passive_v1::open()
 {
 
 	errorCode = np::openProbe(basestation->slot, headstage->port);
-	LOGD("[UG3 PROBE] openProbe: slot: ", basestation->slot, " port: ", headstage->port, " dock: ", dock, " errorCode: ", errorCode);
+	LOGC("[UG3 PROBE] openProbe: slot: ", basestation->slot, " port: ", headstage->port, " dock: ", dock, " errorCode: ", errorCode);
 
 	ap_timestamp = 0;
 	lfp_timestamp = 0;
@@ -110,7 +110,7 @@ bool Neuropixels_UG3_Passive_v1::open()
 bool Neuropixels_UG3_Passive_v1::close()
 {
 	errorCode = np::close(basestation->slot, headstage->port);
-	LOGD("closeProbe: slot: ", basestation->slot, " port: ", headstage->port, " dock: ", dock, " errorCode: ", errorCode);
+	LOGC("closeProbe: slot: ", basestation->slot, " port: ", headstage->port, " dock: ", dock, " errorCode: ", errorCode);
 
 	return errorCode == np::SUCCESS;
 }
@@ -119,13 +119,13 @@ void Neuropixels_UG3_Passive_v1::initialize(bool signalChainIsLoading)
 {
 
 	errorCode = np::init(basestation->slot, headstage->port);
-	LOGD("init: slot: ", basestation->slot, " port: ", headstage->port, " dock: ", dock, " errorCode: ", errorCode);
+	LOGC("init: slot: ", basestation->slot, " port: ", headstage->port, " dock: ", dock, " errorCode: ", errorCode);
 
 	errorCode = np::setOPMODE(basestation->slot, headstage->port, np::RECORDING);
-	LOGD("setOPMODE: slot: ", basestation->slot, " port: ", headstage->port, " dock: ", dock, " errorCode: ", errorCode);
+	LOGC("setOPMODE: slot: ", basestation->slot, " port: ", headstage->port, " dock: ", dock, " errorCode: ", errorCode);
 
 	errorCode = np::setHSLed(basestation->slot, headstage->port, false);
-	LOGD("setHSLed: slot: ", basestation->slot, " port: ", headstage->port, " dock: ", dock, " errorCode: ", errorCode);
+	LOGC("setHSLed: slot: ", basestation->slot, " port: ", headstage->port, " dock: ", dock, " errorCode: ", errorCode);
 
 }
 
@@ -167,31 +167,51 @@ void Neuropixels_UG3_Passive_v1::calibrate()
 
 	String adcFile = probeDirectory.getChildFile(String(info.serial_number) + "_ADCCalibration.csv").getFullPathName();
 	String gainFile = probeDirectory.getChildFile(String(info.serial_number) + "_gainCalValues.csv").getFullPathName();
-	LOGD("ADC file: ", adcFile);
+	LOGC("ADC file: ", adcFile);
 
 	errorCode = np::setADCCalibration(basestation->slot, headstage->port, adcFile.toRawUTF8());
 
-	if (errorCode == 0) { LOGD("Successful ADC calibration."); }
-	else { LOGD("Unsuccessful ADC calibration, failed with error code: ", errorCode); }
+	if (errorCode == 0) { LOGC("Successful ADC calibration."); }
+	else { LOGC("Unsuccessful ADC calibration, failed with error code: ", errorCode); }
 
-	LOGD("Gain file: ", gainFile);
+	LOGC("Gain file: ", gainFile);
 
 	errorCode = np::setGainCalibration(basestation->slot, headstage->port, gainFile.toRawUTF8());
 
-	if (errorCode == 0) { LOGD("Successful gain calibration."); }
-	else { LOGD("Unsuccessful gain calibration, failed with error code: ", errorCode); }
+	if (errorCode == 0) { LOGC("Successful gain calibration."); }
+	else { LOGC("Unsuccessful gain calibration, failed with error code: ", errorCode); }
 
 	// NB: NHP passive does this, but v3 probe doesn't?
 	errorCode = np::writeProbeConfiguration(basestation->slot, headstage->port, false);
 
-	if (!errorCode == np::SUCCESS) { LOGD("Failed to write probe config w/ error code: ", errorCode); }
-	else { LOGD("Successfully wrote probe config "); }
+	if (!errorCode == np::SUCCESS) { LOGC("Failed to write probe config w/ error code: ", errorCode); }
+	else { LOGC("Successfully wrote probe config "); }
 
 }
 
 void Neuropixels_UG3_Passive_v1::selectElectrodes()
 {
+    LOGC("Disconnecting then reconnecting all electrodes...");
+
     // Nothing to select
+    np::NP_ErrorCode ec;
+
+    for (int channel = 0; channel < 384; channel++) {
+        ec = np::selectElectrode(basestation->slot, headstage->port, channel, 0xFF);
+        if (ec != np::SUCCESS) {
+            LOGC("Failed to disconnect electrode ", channel, " w/ error code: ", ec);
+        }
+    }
+
+    for (int channel = 0; channel < 384; channel++) {
+        ec = np::selectElectrode(basestation->slot, headstage->port, channel, 0);
+        if (ec != np::SUCCESS) {
+            LOGC("Failed to disconnect electrode ", channel, " w/ error code: ", ec);
+        }
+    }
+
+
+    LOGC("selectElectrodes finished.");
 }
 
 void Neuropixels_UG3_Passive_v1::setApFilterState()
@@ -202,7 +222,7 @@ void Neuropixels_UG3_Passive_v1::setApFilterState()
 			channel,
 			!settings.apFilterState); // true if disabled
         if (errorCode != np::SUCCESS) {
-            LOGD("Failed to set AP filter state for channel ", channel, " with status code ", errorCode);
+            LOGC("Failed to set AP filter state for channel ", channel, " with status code ", errorCode);
         }
     }
 
@@ -210,7 +230,7 @@ void Neuropixels_UG3_Passive_v1::setApFilterState()
 
 void Neuropixels_UG3_Passive_v1::setAllGains()
 {
-
+    LOGC("Setting gains for all channels...");
 	for (int channel = 0; channel < 384; channel++)
 	{
 		errorCode = np::setGain(basestation->slot, headstage->port,
@@ -219,10 +239,10 @@ void Neuropixels_UG3_Passive_v1::setAllGains()
 			settings.lfpGainIndex);
 
         if (errorCode != np::SUCCESS) {
-            LOGD("Failed to set gain for channel ", channel, " with status code ", errorCode);
+            LOGC("Failed to set gain for channel ", channel, " with status code ", errorCode);
         }
 	}
-
+    LOGC("Gains set.");
 }
 
 
@@ -236,7 +256,7 @@ void Neuropixels_UG3_Passive_v1::setAllReferences()
         errorCode = np::setReference(basestation->slot, headstage->port, channel, refId, refElectrodeBank);
 
         if (errorCode != np::SUCCESS) {
-            LOGD("Failed to set reference for channel ", channel, " with status code ", errorCode);
+            LOGC("Failed to set reference for channel ", channel, " with status code ", errorCode);
         }
     }
 
@@ -247,11 +267,11 @@ void Neuropixels_UG3_Passive_v1::writeConfiguration()
 	errorCode = np::writeProbeConfiguration(basestation->slot, headstage->port, false);
 	if (errorCode == np::SUCCESS)
 	{
-		LOGD("Succesfully wrote probe configuration");
+		LOGC("Succesfully wrote probe configuration");
 	}
 	else
 	{
-		LOGD("!!! FAILED TO WRITE PROBE CONFIGURATION !!! Slot: ", basestation->slot, " port: ", headstage->port, " error code: ", errorCode);
+		LOGC("!!! FAILED TO WRITE PROBE CONFIGURATION !!! Slot: ", basestation->slot, " port: ", headstage->port, " error code: ", errorCode);
 	}
 }
 
@@ -271,7 +291,7 @@ void Neuropixels_UG3_Passive_v1::startAcquisition()
 
 	SKIP = sendSync ? 385 : 384;
 
-	LOGD("  Starting thread.");
+	LOGC("  Starting thread.");
 	startThread();
 }
 
@@ -314,7 +334,7 @@ void Neuropixels_UG3_Passive_v1::run()
 					{
 						if (passedOneSecond && timestamp_jump < MAX_HEADSTAGE_CLK_SAMPLE)
 						{
-							LOGD("NPX TIMESTAMP JUMP: ", npx_timestamp - last_npx_timestamp,
+							LOGC("NPX TIMESTAMP JUMP: ", npx_timestamp - last_npx_timestamp,
 								", expected 3 or 4...Possible data loss on slot ",
 								int(basestation->slot_c), ", probe ", int(headstage->port_c),
 								" at sample number ", ap_timestamp);
@@ -371,7 +391,7 @@ void Neuropixels_UG3_Passive_v1::run()
 		}
 		else if (errorCode != np::SUCCESS)
 		{
-			LOGD("readPackets error code: ", errorCode, " for Basestation ", int(basestation->slot), ", probe ", int(headstage->port));
+			LOGC("readPackets error code: ", errorCode, " for Basestation ", int(basestation->slot), ", probe ", int(headstage->port));
 		}
 
 		if (ap_timestamp % 30000 == 0)
